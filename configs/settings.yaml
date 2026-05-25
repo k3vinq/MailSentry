@@ -1,8 +1,8 @@
 dataset:
-  path: data/emails.csv
-  text_column: email_text
-  label_column: label
-  positive_labels: ["phishing", "spam", 1, "1", true, "true"]
+  path: data/Phishing_Email.csv
+  text_column: "Email Text"
+  label_column: "Email Type"
+  positive_labels: ["Phishing Email", "phishing", "spam", 1, "1", true, "true"]
 
 preprocessing:
   lowercase: true
