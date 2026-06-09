@@ -26,3 +26,13 @@ features:
 training:
   test_size: 0.2
   random_state: 42
+
+transformer:
+  model_name: "distilbert-base-uncased"
+  max_length: 512
+  batch_size: 16
+  epochs: 3
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_steps: 500
+  output_dir: "models/distilbert"

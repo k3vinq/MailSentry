@@ -74,7 +74,8 @@ def main():
 
     results = []
     Path("models").mkdir(exist_ok=True)
-    Path("reports").mkdir(exist_ok=True)
+    Path("reports/evaluation").mkdir(parents=True, exist_ok=True)
+    Path("reports/error_analysis").mkdir(parents=True, exist_ok=True)
 
     for name, model in models.items():
         model.fit(X_train, y_train)
@@ -83,12 +84,12 @@ def main():
         joblib.dump(model, f"models/{name}.joblib")
 
         # Save confusion matrix and classification report for each model
-        save_confusion_matrix(y_test, preds, output_path=f"reports/confusion_matrix_{name}.png")
+        save_confusion_matrix(y_test, preds, output_path=f"reports/evaluation/confusion_matrix_{name}.png")
         print(f"\n--- {name} ---")
         print_classification_report(y_test, preds)
 
         # Save misclassified samples for error analysis
-        save_misclassified_samples(y_test, preds, X_test_raw, output_path=f"reports/error_analysis_{name}.md")
+        save_misclassified_samples(y_test, preds, X_test_raw, output_path=f"reports/error_analysis/error_analysis_{name}.md")
 
     joblib.dump(vectorizer, "models/vectorizer.joblib")
     joblib.dump(scaler, "models/scaler.joblib")
@@ -106,7 +107,7 @@ def main():
         f.write("|---|---|---|---|---|\n")
         for row in results:
             f.write(f"| {row['model']} | {row['accuracy']:.4f} | {row['precision']:.4f} | {row['recall']:.4f} | {row['f1']:.4f} |\n")
-        f.write("\nConfusion matrices saved in `reports/` folder.\n")
+        f.write("\nConfusion matrices saved in `reports/evaluation/` folder.\n")
 
 
 if __name__ == "__main__":

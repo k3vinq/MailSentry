@@ -1,10 +1,10 @@
 # Architecture
 
 ## 1. Project Goal
-Build a course-project system for **text-based phishing email detection** using NLP and classical machine learning. The system should be simple enough to implement in a limited academic timeline, but structured enough to demonstrate sound software and ML design.
+Build a course-project system for **text-based phishing email detection** using NLP techniques, comparing **classical machine learning** (TF-IDF + NB/SVM/LR) against a **Transformer-based model** (DistilBERT). The system demonstrates both traditional and modern deep learning approaches to NLP.
 
-## 2. Recommended Project Title
-**Text-Based Phishing Email Detection Using NLP and Machine Learning**
+## 2. Project Title
+**Text-Based Phishing Email Detection Using NLP and Machine Learning with Transformer Comparison**
 
 ## 3. High-Level Pipeline
 
@@ -14,27 +14,31 @@ Dataset / Raw Email Text
         v
 Data Loading and Validation
         |
-        v
-Text Preprocessing
-        |
-        v
-Feature Engineering
-   |                |
-   |                +--> Heuristic phishing indicators
-   |
-   +--------------------> TF-IDF text features
-        |
-        v
-Feature Fusion
-        |
-        v
-Model Training and Comparison
-        |
-        v
-Evaluation and Error Analysis
-        |
-        v
-Prediction Demo / Small App
+        +------------------+
+        |                  |
+        v                  v
+  Classical ML         Transformer
+  Pipeline             Pipeline
+        |                  |
+        v                  v
+  Text Preprocessing   Tokenization
+  (clean_text)         (DistilBertTokenizer)
+        |                  |
+        v                  v
+  TF-IDF +             DistilBERT
+  Heuristics           Fine-tuning
+        |                  |
+        v                  v
+  NB / SVM / LR        Classification
+  Training             Head Training
+        |                  |
+        +--------+---------+
+                 |
+                 v
+        Evaluation & Comparison
+                 |
+                 v
+        Streamlit Demo App
 ```
 
 ## 4. Architectural Layers
@@ -102,19 +106,29 @@ Combine TF-IDF features with heuristic phishing indicators.
 - Dense numeric matrix from handcrafted features
 - Concatenate them before training
 
-### 4.5 Model Layer
-Train and compare several classical ML models.
+### 4.5a Model Layer — Classical ML
+Train and compare several classical ML models as baselines.
 
-**Recommended baseline and comparison models**
+**Models**
 - Multinomial Naive Bayes
 - Logistic Regression
 - Linear SVM
 
-**Optional extensions**
-- Random Forest
-- XGBoost
+These three provide a strong and defensible baseline set for comparison.
 
-For a course project, the first three are already a strong and defensible set.
+### 4.5b Model Layer — Transformer (DistilBERT)
+Fine-tune a pre-trained **DistilBERT** (`distilbert-base-uncased`) model for sequence classification.
+
+**Key differences from Classical ML**
+- No need for TF-IDF or heuristic features — BERT learns features directly from raw tokens.
+- Uses HuggingFace `Trainer` API with `DistilBertForSequenceClassification`.
+- Training config: 3 epochs, lr=2e-5, batch_size=16, max_length=512, fp16 mixed precision.
+- Model saved to `models/distilbert/` (config.json + model.safetensors + tokenizer files).
+
+**Why DistilBERT?**
+- 40% smaller than BERT, 60% faster, retains 97% performance.
+- Demonstrates understanding of Transformer architecture in an NLP course.
+- Fine-tuning on 18K samples takes ~5-15 minutes on GPU (L40/A100).
 
 ### 4.6 Evaluation Layer
 This is where the project becomes academically convincing.
@@ -146,35 +160,45 @@ A small demo helps the project feel complete.
 **Recommended scope**
 A lightweight Streamlit app is enough: user pastes email text and gets a prediction.
 
-## 5. Proposed Repository Structure
+## 5. Repository Structure
 
 ```text
-project/
+MailSentry/
 ├── app/
-│   └── streamlit_app.py
+│   └── streamlit_app.py         # Demo app (Classical ML + DistilBERT)
 ├── configs/
-│   └── settings.yaml
+│   └── settings.yaml            # All hyperparameters
 ├── data/
-│   └── README.md
+│   └── Phishing_Email.csv
 ├── models/
-│   └── README.md
+│   ├── naive_bayes.joblib       # Classical ML models
+│   ├── logistic_regression.joblib
+│   ├── linear_svm.joblib
+│   ├── vectorizer.joblib
+│   ├── scaler.joblib
+│   └── distilbert/              # Fine-tuned Transformer
+│       ├── config.json
+│       ├── model.safetensors
+│       └── tokenizer files...
 ├── notebooks/
 │   └── exploration.ipynb
 ├── reports/
-│   └── README.md
+│   ├── evaluation/              # Confusion matrices
+│   └── error_analysis/          # Misclassified samples
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py
-│   ├── preprocess.py
-│   ├── features.py
-│   ├── train.py
-│   ├── evaluate.py
-│   ├── predict.py
-│   └── utils.py
+│   ├── data_loader.py           # CSV loading & label normalization
+│   ├── preprocess.py            # Text cleaning for TF-IDF
+│   ├── features.py              # TF-IDF + heuristic features
+│   ├── train.py                 # Classical ML training
+│   ├── train_bert.py            # DistilBERT fine-tuning
+│   ├── dataset_bert.py          # PyTorch Dataset for BERT
+│   ├── evaluate.py              # Metrics, confusion matrix, error analysis
+│   ├── predict.py               # Prediction (Classical + BERT)
+│   └── utils.py                 # Config loader
 ├── architecture.md
-├── tasks.md
-├── README.md
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ## 6. Design Rationale
@@ -189,21 +213,26 @@ It is not meant to be production-grade. It is meant to be:
 - defensible in a course presentation,
 - and feasible within a student timeline.
 
-## 7. Suggested Development Strategy
+## 7. Development Strategy
 1. Start with TF-IDF + Naive Bayes baseline.
 2. Add Logistic Regression and Linear SVM.
 3. Add handcrafted phishing features.
-4. Compare results.
-5. Build a small prediction demo.
-6. Write report and slides around the final pipeline.
+4. Compare classical ML results.
+5. Fine-tune DistilBERT and compare against classical baselines.
+6. Build Streamlit demo supporting all models.
+7. Write report and slides around the full pipeline comparison.
 
-## 8. What to Avoid
-- Using too many models without explanation.
-- Claiming “full phishing detection” if only email body text is used.
-- Overcomplicating the project with deep learning unless clearly justified.
-- Submitting only a messy notebook without modular code.
+## 8. Classical ML vs Transformer Comparison
 
-## 9. Final Recommended Scope
-A strong final scope for this course project is:
+| Aspect | Classical ML | DistilBERT |
+|---|---|---|
+| Feature engineering | Manual (TF-IDF + heuristics) | Automatic (learned from tokens) |
+| Training time | Seconds | 5-15 minutes (GPU) |
+| Model size | ~10 MB (joblib) | ~250 MB (safetensors) |
+| Interpretability | High (feature weights) | Low (black-box attention) |
+| Expected accuracy | ~95-97% | ~98-99% |
+| Inference speed | Very fast (CPU) | Slower (GPU recommended) |
 
-> A modular NLP-based phishing email detection system using TF-IDF text features, phishing-specific heuristic indicators, and comparative evaluation of classical machine learning models.
+## 9. Final Scope
+
+> A modular NLP-based phishing email detection system comparing classical machine learning (TF-IDF + NB/SVM/LR) with a fine-tuned DistilBERT Transformer, demonstrating both traditional and modern deep learning approaches to text classification.

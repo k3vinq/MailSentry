@@ -1,21 +1,61 @@
-# Text-Based Phishing Email Detection Using NLP and Machine Learning
+# MailSentry: Text-Based Phishing Email Detection
 
-This repository is an initial codebase for a course project on phishing email detection using NLP and classical machine learning.
+A comprehensive course project for CS221 (Natural Language Processing) that detects phishing emails using **Transformer-based Deep Learning** (DistilBERT).
 
-## Included in this starter package
-- `architecture.md`: detailed system architecture
-- `tasks.md`: project task breakdown and checklist
-- modular `src/` package
-- basic training and prediction entry points
-- simple Streamlit demo
-- project structure ready for extension
+## Features
+- **Deep Learning Pipeline**: Fine-tunes a `distilbert-base-uncased` transformer model to classify raw email sequences directly.
+- **Web App**: An interactive Streamlit demo application that allows users to paste email text and get real-time predictions along with confidence scores.
 
-## Suggested workflow
-1. Put your dataset into `data/`.
-2. Adjust column names in `configs/settings.yaml` if needed.
-3. Run preprocessing and training.
-4. Evaluate several models.
-5. Launch the demo app.
+## Installation
 
-## Notes
-This starter focuses on a **course-project-friendly architecture** rather than a production-ready security system.
+```bash
+# Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+*(Note: If you plan to train DistilBERT on a GPU, please install PyTorch with the correct CUDA version manually).*
+
+## Usage
+
+### 1. Run the Web Application
+Launch the interactive Streamlit app to test models:
+```bash
+streamlit run app/streamlit_app.py
+```
+
+### 2. Predict from Command Line
+Predict a single email text using the CLI:
+```bash
+# Using DistilBERT
+python -m src.predict "URGENT! Please verify your account immediately." --bert
+```
+
+### 3. Training Models
+
+**Train DistilBERT:**
+To train the Transformer model (GPU highly recommended):
+```bash
+python -m src.train_bert
+
+# Or submit a Slurm job on a cluster:
+# sbatch train_bert.sh
+```
+
+## Project Structure
+- `app/`: Streamlit web application.
+- `configs/`: Hyperparameters and feature keywords.
+- `data/`: Dataset (`Phishing_Email.csv`).
+- `models/`: Trained `.joblib` files and the saved DistilBERT directory.
+- `reports/`: Evaluation metrics, error analysis, and Final Report Structure.
+- `src/`: Core Python modules for data loading, preprocessing, feature extraction, and model training.
+
+## Evaluation
+The **DistilBERT** model achieved excellent performance on the test set:
+- **Accuracy**: 97.77%
+- **F1-score**: 97.20%
+
+Confusion matrices and misclassified samples are automatically saved to the `reports/` folder during training for detailed error analysis.
+
