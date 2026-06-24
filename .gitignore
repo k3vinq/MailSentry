@@ -8,6 +8,7 @@ check.py
 # Model files (too large for git)
 models/*.joblib
 models/distilbert/
+models/distilbert/*.zip
 
 # Slurm logs
 logs/
@@ -19,6 +20,7 @@ checkpoint-*/
 reports/Error_Analysis_*.md
 reports/Final_Report_Structure.md
 reports/Manual_Analysis_*.md
+reports/*.md
 
 
 

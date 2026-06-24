@@ -29,8 +29,7 @@ streamlit run app/streamlit_app.py
 ### 2. Predict from Command Line
 Predict a single email text using the CLI:
 ```bash
-# Using DistilBERT
-python -m src.predict "URGENT! Please verify your account immediately." --bert
+python -m src.predict "URGENT! Please verify your account immediately."
 ```
 
 ### 3. Training Models
@@ -39,18 +38,15 @@ python -m src.predict "URGENT! Please verify your account immediately." --bert
 To train the Transformer model (GPU highly recommended):
 ```bash
 python -m src.train_bert
-
-# Or submit a Slurm job on a cluster:
-# sbatch train_bert.sh
 ```
 
 ## Project Structure
 - `app/`: Streamlit web application.
-- `configs/`: Hyperparameters and feature keywords.
+- `configs/`: Hyperparameters configuration.
 - `data/`: Dataset (`Phishing_Email.csv`).
-- `models/`: Trained `.joblib` files and the saved DistilBERT directory.
+- `models/`: Saved DistilBERT model directory.
 - `reports/`: Evaluation metrics, error analysis, and Final Report Structure.
-- `src/`: Core Python modules for data loading, preprocessing, feature extraction, and model training.
+- `src/`: Core Python modules for data loading, preprocessing, and model training.
 
 ## Evaluation
 The **DistilBERT** model achieved excellent performance on the test set:

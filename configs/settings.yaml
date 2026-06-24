@@ -8,20 +8,6 @@ preprocessing:
   lowercase: true
   strip_whitespace: true
 
-features:
-  tfidf_max_features: 5000
-  tfidf_ngram_range: [1, 2]
-  suspicious_keywords:
-    - urgent
-    - verify
-    - password
-    - account
-    - click
-    - login
-    - bank
-    - update
-    - suspend
-    - confirm
 
 training:
   test_size: 0.2
