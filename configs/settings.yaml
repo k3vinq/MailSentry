@@ -1,28 +1,24 @@
 dataset:
-  path: data/emails.csv
-  text_column: email_text
-  label_column: label
-  positive_labels: ["phishing", "spam", 1, "1", true, "true"]
+  path: data/Phishing_Email.csv
+  text_column: "Email Text"
+  label_column: "Email Type"
+  positive_labels: ["Phishing Email", "phishing", "spam", 1, "1", true, "true"]
 
 preprocessing:
   lowercase: true
   strip_whitespace: true
 
-features:
-  tfidf_max_features: 5000
-  tfidf_ngram_range: [1, 2]
-  suspicious_keywords:
-    - urgent
-    - verify
-    - password
-    - account
-    - click
-    - login
-    - bank
-    - update
-    - suspend
-    - confirm
 
 training:
   test_size: 0.2
   random_state: 42
+
+transformer:
+  model_name: "distilbert-base-uncased"
+  max_length: 512
+  batch_size: 16
+  epochs: 3
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_steps: 500
+  output_dir: "models/distilbert"

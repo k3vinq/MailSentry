@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+source_dump.txt
+check.py
+*.sh
+
+# Model files (too large for git)
+models/*.joblib
+models/distilbert/
+models/distilbert/*.zip
+
+# Slurm logs
+logs/
+
+# HuggingFace Trainer checkpoints (inside output_dir)
+checkpoint-*/
+
+# reports
+reports/Error_Analysis_*.md
+reports/Final_Report_Structure.md
+reports/Manual_Analysis_*.md
+reports/*.md
+
+
+

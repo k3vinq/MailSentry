@@ -1,10 +1,10 @@
 # Architecture
 
 ## 1. Project Goal
-Build a course-project system for **text-based phishing email detection** using NLP and classical machine learning. The system should be simple enough to implement in a limited academic timeline, but structured enough to demonstrate sound software and ML design.
+Build a course-project system for **text-based phishing email detection** using modern NLP techniques. The system demonstrates the use of a **Transformer-based model** (DistilBERT) for text classification.
 
-## 2. Recommended Project Title
-**Text-Based Phishing Email Detection Using NLP and Machine Learning**
+## 2. Project Title
+**Text-Based Phishing Email Detection Using DistilBERT**
 
 ## 3. High-Level Pipeline
 
@@ -15,26 +15,25 @@ Dataset / Raw Email Text
 Data Loading and Validation
         |
         v
-Text Preprocessing
+  Text Preprocessing
         |
         v
-Feature Engineering
-   |                |
-   |                +--> Heuristic phishing indicators
-   |
-   +--------------------> TF-IDF text features
+  Tokenization
+  (DistilBertTokenizer)
         |
         v
-Feature Fusion
+  DistilBERT
+  Fine-tuning
         |
         v
-Model Training and Comparison
+  Classification
+  Head Training
         |
         v
-Evaluation and Error Analysis
+  Evaluation
         |
         v
-Prediction Demo / Small App
+  Streamlit Demo App
 ```
 
 ## 4. Architectural Layers
@@ -63,60 +62,25 @@ Transforms raw text into a normalized form while preserving useful phishing sign
 - Lowercasing
 - Whitespace normalization
 - Optional punctuation cleanup
-- Optional stopword removal
-- Optional lemmatization
 
 **Important design note**
-Do not over-clean the text. Some phishing indicators such as `http`, `verify`, `urgent`, and unusual punctuation can be useful.
+Do not over-clean the text. Some phishing indicators such as `http`, `verify`, `urgent`, and unusual punctuation can be useful context for the transformer model.
 
-### 4.3 Feature Engineering Layer
-This layer combines two feature families.
+### 4.3 Model Layer — Transformer (DistilBERT)
+Fine-tune a pre-trained **DistilBERT** (`distilbert-base-uncased`) model for sequence classification.
 
-#### A. TF-IDF Text Features
-Use `TfidfVectorizer` to represent email text numerically.
+**Key features**
+- BERT learns features directly from raw tokens.
+- Uses HuggingFace `Trainer` API with `DistilBertForSequenceClassification`.
+- Training config: 3 epochs, lr=2e-5, batch_size=16, max_length=512, fp16 mixed precision.
+- Model saved to `models/distilbert/` (config.json + model.safetensors + tokenizer files).
 
-**Suggested configurations**
-- Unigram baseline
-- Unigram + bigram comparison
-- `max_features` set to a manageable range
+**Why DistilBERT?**
+- 40% smaller than BERT, 60% faster, retains 97% performance.
+- Demonstrates understanding of Transformer architecture in an NLP course.
+- Fine-tuning on 18K samples takes ~5-15 minutes on GPU (L40/A100).
 
-#### B. Heuristic Phishing Features
-Add handcrafted features inspired by the phishing domain.
-
-**Suggested features**
-- URL count
-- Suspicious keyword count
-- Email length
-- Exclamation mark count
-- Uppercase ratio
-- Digit ratio
-- Presence of urgency words
-
-These features make the project more security-aware and less generic than a pure text classification notebook.
-
-### 4.4 Feature Fusion Layer
-Combine TF-IDF features with heuristic phishing indicators.
-
-**Implementation idea**
-- Sparse matrix from TF-IDF
-- Dense numeric matrix from handcrafted features
-- Concatenate them before training
-
-### 4.5 Model Layer
-Train and compare several classical ML models.
-
-**Recommended baseline and comparison models**
-- Multinomial Naive Bayes
-- Logistic Regression
-- Linear SVM
-
-**Optional extensions**
-- Random Forest
-- XGBoost
-
-For a course project, the first three are already a strong and defensible set.
-
-### 4.6 Evaluation Layer
+### 4.4 Evaluation Layer
 This is where the project becomes academically convincing.
 
 **Metrics to report**
@@ -130,12 +94,11 @@ This is where the project becomes academically convincing.
 A false negative is often more dangerous than a false positive in phishing detection, because a malicious email may be marked safe.
 
 **Recommended outputs**
-- Model comparison table
 - Confusion matrix plot
 - Classification report
 - Error analysis examples
 
-### 4.7 Demo Layer
+### 4.5 Demo Layer
 A small demo helps the project feel complete.
 
 **Options**
@@ -146,42 +109,44 @@ A small demo helps the project feel complete.
 **Recommended scope**
 A lightweight Streamlit app is enough: user pastes email text and gets a prediction.
 
-## 5. Proposed Repository Structure
+## 5. Repository Structure
 
 ```text
-project/
+MailSentry/
 ├── app/
-│   └── streamlit_app.py
+│   └── streamlit_app.py         # Demo app
 ├── configs/
-│   └── settings.yaml
+│   └── settings.yaml            # All hyperparameters
 ├── data/
-│   └── README.md
+│   └── Phishing_Email.csv
 ├── models/
-│   └── README.md
+│   └── distilbert/              # Fine-tuned Transformer
+│       ├── config.json
+│       ├── model.safetensors
+│       └── tokenizer files...
 ├── notebooks/
 │   └── exploration.ipynb
 ├── reports/
-│   └── README.md
+│   ├── evaluation/              # Confusion matrices
+│   └── error_analysis/          # Misclassified samples
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py
-│   ├── preprocess.py
-│   ├── features.py
-│   ├── train.py
-│   ├── evaluate.py
-│   ├── predict.py
-│   └── utils.py
+│   ├── data_loader.py           # CSV loading & label normalization
+│   ├── preprocess.py            # Text cleaning
+│   ├── train_bert.py            # DistilBERT fine-tuning
+│   ├── dataset_bert.py          # PyTorch Dataset for BERT
+│   ├── evaluate.py              # Metrics, confusion matrix, error analysis
+│   ├── predict.py               # Prediction
+│   └── utils.py                 # Config loader
 ├── architecture.md
-├── tasks.md
-├── README.md
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ## 6. Design Rationale
-This architecture intentionally combines:
-- the **simplicity** of a baseline NLP notebook,
+This architecture intentionally uses:
 - the **experimental clarity** of a Kaggle workflow,
-- and the **phishing-aware features** inspired by more security-oriented projects.
+- and the **advanced contextual embeddings** provided by a DistilBERT Transformer.
 
 It is not meant to be production-grade. It is meant to be:
 - understandable,
@@ -189,21 +154,12 @@ It is not meant to be production-grade. It is meant to be:
 - defensible in a course presentation,
 - and feasible within a student timeline.
 
-## 7. Suggested Development Strategy
-1. Start with TF-IDF + Naive Bayes baseline.
-2. Add Logistic Regression and Linear SVM.
-3. Add handcrafted phishing features.
-4. Compare results.
-5. Build a small prediction demo.
-6. Write report and slides around the final pipeline.
+## 7. Development Strategy
+1. Start with Data Exploration and preprocessing.
+2. Fine-tune DistilBERT on the dataset.
+3. Build Streamlit demo.
+4. Write report and slides around the pipeline evaluation.
 
-## 8. What to Avoid
-- Using too many models without explanation.
-- Claiming “full phishing detection” if only email body text is used.
-- Overcomplicating the project with deep learning unless clearly justified.
-- Submitting only a messy notebook without modular code.
+## 8. Final Scope
 
-## 9. Final Recommended Scope
-A strong final scope for this course project is:
-
-> A modular NLP-based phishing email detection system using TF-IDF text features, phishing-specific heuristic indicators, and comparative evaluation of classical machine learning models.
+> A modular NLP-based phishing email detection system using a fine-tuned DistilBERT Transformer, demonstrating modern deep learning approaches to text classification.
